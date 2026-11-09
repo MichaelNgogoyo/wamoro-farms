@@ -53,6 +53,24 @@ Copy `.env.example` into the deployment environment and configure:
 
 Use a Node.js host that runs the Next.js server and mounts a persistent volume at `UPLOAD_DIR`. Configure HTTPS at the host or reverse proxy, run `npm ci`, `npm run db:deploy`, then `npm run build` and `npm run start`. Do not deploy the upload directory on ephemeral storage or share a development database in production. M-Pesa remains disabled until the verified Till number and integration credentials are supplied.
 
+### VPS deployment with GitHub Actions
+
+`.github/workflows/deploy.yml` deploys the `main` branch to `wamoro.apperstar.com` over SSH. It sends a source archive to the restricted deployment command on the VPS; Docker builds and runs the Next.js server there. PostgreSQL and uploaded media use persistent Docker/host storage. This is a server-rendered Node deployment, not a static export.
+
+The workflow reads these **repository variables** under **Settings → Secrets and variables → Actions → Variables**:
+
+- `DEPLOY_HOST`: `31.97.116.56`
+- `DEPLOY_USER`: `michael`
+- `DEPLOY_KNOWN_HOSTS`: the pinned SSH host-key line for `31.97.116.56` (already configured on the Wamoro Farms repository)
+
+It reads one **repository secret** under **Settings → Secrets and variables → Actions → Secrets**:
+
+- `DEPLOY_SSH_KEY`: the dedicated Ed25519 private key paired with the restricted deploy key installed for `michael` (already configured on the Wamoro Farms repository)
+
+The workflow is configured to deploy on pushes to `main` and on manual `workflow_dispatch`. It does not need database or admin passwords in GitHub: runtime credentials stay in `/home/michael/wamoro-farms/.env.production` on the VPS. That file contains `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `DATABASE_URL`, `SESSION_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME`, `NEXT_PUBLIC_SITE_URL`, `UPLOAD_DIR`, and `MAX_UPLOAD_MB`. Keep it owned by `michael` with mode `600`; never commit it. PostgreSQL and media uploads persist in separate Docker volumes; the uploads volume is prepared for the unprivileged Node user.
+
+The host reverse proxy config is `deploy/wamoro-farms.nginx.conf`. Certbot’s HTTP-01 challenge uses `/var/www/certbot`, and the host’s existing `certbot.timer` handles renewals. See `docker-compose.prod.yml` and `deploy/receive-deploy.sh` for the isolated app port, migration step, upload mount, and restricted deploy command.
+
 ### Backups
 
 Back up PostgreSQL and the upload volume together. Example commands (replace the connection details and paths):
