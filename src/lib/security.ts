@@ -7,7 +7,13 @@ export function originIsLocal(request: NextRequest) {
   const origin = request.headers.get("origin");
   if (!origin) return false;
   try {
-    return new URL(origin).origin === new URL(request.url).origin;
+    const forwardedProto = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+    const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+    const host = forwardedHost || request.headers.get("host");
+    const expectedOrigin = host && (forwardedProto === "http" || forwardedProto === "https")
+      ? new URL(`${forwardedProto}://${host}`).origin
+      : new URL(request.url).origin;
+    return new URL(origin).origin === expectedOrigin;
   } catch {
     return false;
   }
