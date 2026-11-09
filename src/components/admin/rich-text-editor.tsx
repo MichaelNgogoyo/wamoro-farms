@@ -16,7 +16,7 @@ export function RichTextEditor({ value, onChange }: { value: string; onChange: (
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
-      StarterKit,
+      StarterKit.configure({ link: false }),
       Link.configure({ openOnClick: false, autolink: true }),
       Image.configure({ allowBase64: false }),
       Youtube.configure({ controls: true, nocookie: true, modestBranding: true }),

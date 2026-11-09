@@ -28,7 +28,7 @@ export default async function HomePage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <section className="home-hero">
-        <div className="home-hero-photo"><Image src={settings.founderPortrait || "/images/farm/orchard-rows-aerial.jpg"} alt={settings.founderPortrait ? "Wamoro Farms founder in the field" : "Carefully managed rows of trees in a productive orchard"} fill priority sizes="100vw" /></div>
+        <div className="home-hero-photo"><Image src={settings.founderPortrait || "/images/farm/orchard-rows-aerial.jpg"} alt={settings.founderPortrait ? "Wamoro Farms founder in the field" : "Carefully managed rows of trees in a productive orchard"} fill loading="eager" fetchPriority="high" sizes="(max-width: 800px) 100vw, 56vw" /></div>
         <div className="container home-hero-inner">
           <div className="hero-copy">
             <span className="eyebrow eyebrow-light">Wamoro Farms · Kenya</span>

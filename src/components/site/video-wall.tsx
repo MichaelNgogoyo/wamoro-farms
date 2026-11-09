@@ -14,8 +14,8 @@ function embedTarget(item: VideoCardData) {
       if (id && /^\d{8,}$/.test(id)) return { src: `https://www.tiktok.com/player/v1/${id}`, label: "TikTok video" };
     }
     if (item.platform === "instagram" && ["instagram.com", "www.instagram.com"].includes(url.hostname)) {
-      const path = url.pathname.match(/^\/(?:p|reel|reels)\/([A-Za-z0-9_-]+)\/?$/);
-      if (path) return { src: `https://www.instagram.com/p/${path[1]}/embed`, label: "Instagram post" };
+      const path = url.pathname.match(/^\/(p|reel|reels)\/([A-Za-z0-9_-]+)\/?$/);
+      if (path) return { src: `https://www.instagram.com/${path[1] === "p" ? "p" : "reel"}/${path[2]}/embed`, label: "Instagram post" };
     }
     if (item.platform === "facebook" && ["facebook.com", "www.facebook.com"].includes(url.hostname)) {
       return { src: `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(item.url)}&show_text=true&width=500`, label: "Facebook post" };
