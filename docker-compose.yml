@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: wamoro_farms
+      POSTGRES_USER: wamoro
+      POSTGRES_PASSWORD: wamoro_dev
+    ports:
+      - "5433:5432"
+    volumes:
+      - wamoro_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wamoro -d wamoro_farms"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+volumes:
+  wamoro_postgres:
